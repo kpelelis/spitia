@@ -30,12 +30,13 @@ class Houses extends React.Component {
     this.state = {
       houses: [],
       search: params.q || '',
-      orderBy: params.order || 'date'
+      orderBy: params.order || 'date',
+      user: params.user || 'kpelelis'
     };
   }
 
   componentDidMount() {
-    fetch('houses.json')
+    fetch(`houses-${this.state.user}.json`)
       .then(r => r.json())
       .then(houses => {
         this.setState({ houses });
@@ -47,9 +48,9 @@ class Houses extends React.Component {
     this.setState({ search: e.target.value });
   }
 
-	onOrderBy = (e) => {
-		this.setState({ orderBy: e.target.value });
-	}
+  onOrderBy = (e) => {
+    this.setState({ orderBy: e.target.value });
+  }
 
   render() {
     if (!this.state.houses) return null;
@@ -68,12 +69,12 @@ class Houses extends React.Component {
             fontSize: '4rem'
           }}
         />
-				<label>Order by</label>
-				<select value={this.state.orderBy} onChange={this.onOrderBy}>
-					<option value="date">Date Edited</option>
-  				<option value="name">Name</option>
-  				<option selected value="price">Price</option>
-				</select>
+        <label>Order by</label>
+        <select value={this.state.orderBy} onChange={this.onOrderBy}>
+          <option value="date">Date Edited</option>
+          <option value="name">Name</option>
+          <option selected value="price">Price</option>
+        </select>
         <ul
           style={{
             margin: 0,
@@ -86,17 +87,17 @@ class Houses extends React.Component {
               description.toLowerCase().includes(
                 this.state.search.toLowerCase()))
             .sort((a, b) => {
-							switch(this.state.orderBy) {
-								case 'date':
-									return new Date(b.date) - new Date(a.date)
-								case 'name':
-									return b.location < a.location ? 1 : -1;
-								case 'price':
-									const ap = parseInt(a.price.split(' ')[0]);
-									const bp = parseInt(b.price.split(' ')[0]);
-									return ap - bp;
-							}
-						})
+              switch(this.state.orderBy) {
+                case 'date':
+                  return new Date(b.date) - new Date(a.date)
+                case 'name':
+                  return b.location < a.location ? 1 : -1;
+                case 'price':
+                  const ap = parseInt(a.price ? a.price.split(' ')[0] : Infinity);
+                  const bp = parseInt(b.price ? b.price.split(' ')[0] : Infinity);
+                  return ap - bp;
+              }
+            })
             .map((item, index) => {
               let {
                 href,
